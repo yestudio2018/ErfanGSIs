@@ -156,9 +156,9 @@ if [[ ! -e $romsdir/$sourcever/$romtype/$romtypename/DONTRESIGN ]]; then
         echo "Resigning to AOSP keys"
         ispython2=`python -c 'import sys; print("%i" % (sys.hexversion<0x03000000))'`
         if [ $ispython2 -eq 0 ]; then
-            python2=python2
+            python2=python3
         else
-            python2=python
+            python2=python3
         fi
         $python2 $toolsdir/ROM_resigner/resign.py "$systemdir/system" $toolsdir/ROM_resigner/AOSP_security > $tempdir/resign.log
         $prebuiltdir/resigned/make.sh "$systemdir/system" 2>/dev/null
