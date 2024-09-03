@@ -7,7 +7,7 @@ TOOLS_DIR="$PROJECT_DIR/tools"
 PARTITIONS="system vendor cust odm oem factory product xrom systemex system_ext reserve india"
 
 AB=true
-AONLY=true
+AONLY=false
 MOUNTED=false
 CLEAN=false
 
@@ -142,11 +142,11 @@ if [ $MOUNTED == false ]; then
 fi
 
 if [ $AB == true ]; then
-   sudo "$PROJECT_DIR"/make.sh "${URL}" "${SRCTYPE}" AB "$PROJECT_DIR/output" ${@} || LEAVE
+   bash "$PROJECT_DIR"/make.sh "${URL}" "${SRCTYPE}" AB "$PROJECT_DIR/output" ${@} || LEAVE
 fi
 
 if [ $AONLY == true ]; then
-   sudo "$PROJECT_DIR"/make.sh "${URL}" "${SRCTYPE}" Aonly "$PROJECT_DIR/output" ${@} || LEAVE
+   bash "$PROJECT_DIR"/make.sh "${URL}" "${SRCTYPE}" Aonly "$PROJECT_DIR/output" ${@} || LEAVE
 fi
 
 echo "Porting ${SRCTYPENAME} GSI done on: $PROJECT_DIR/output"
