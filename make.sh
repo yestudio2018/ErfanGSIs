@@ -216,3 +216,37 @@ outputinfo="$outdir/$outputtextname"
 $scriptsdir/getinfo.sh "$systemdir/system" > "$outputinfo"
 
 if [[ $(grep "ro.build.display.id" $systemdir/system/build.prop) ]]; then
+    displayid="ro.build.display.id"
+elif [[ $(grep "ro.system.build.id" $systemdir/system/build.prop) ]]; then
+    displayid="ro.system.build.id"
+elif [[ $(grep "ro.build.id" $systemdir/system/build.prop) ]]; then
+    displayid="ro.build.id"
+fi
+displayid2=$(echo "$displayid" | sed 's/\./\\./g')
+bdisplay=$(grep "$displayid" $systemdir/system/build.prop | sed 's/\./\\./g; s:/:\\/:g; s/\,/\\,/g; s/\ /\\ /g')
+sed -i "s/$bdisplay/$displayid2=Built\.with\.ErfanGSI\.Tools/" $systemdir/system/build.prop
+
+# Getting system size and add approximately 5% on it just for free space
+systemsize=`du -sk $systemdir | awk '{$1*=1024;$1=int($1*1.05);printf $1}'`
+bytesToHuman() {
+    b=${1:-0}; d=''; s=0; S=(Bytes {K,M,G,T,P,E,Z,Y}iB)
+    while ((b > 1024)); do
+        d="$(printf ".%02d" $((b % 1024 * 100 / 1024)))"
+        b=$((b / 1024))
+        let s++
+    done
+    echo "$b$d ${S[$s]}"
+}
+echo "Raw Image Size: $(bytesToHuman $systemsize)" >> "$outputinfo"
+
+echo "Creating Image: $outputimagename"
+# Use ext4fs to make image in P or older!
+if [ "$sourcever" == "9" ]; then
+    useold="--old"
+fi
+echo $systemdir $outputtype $systemsize $output $useold
+$scriptsdir/mkimage.sh $systemdir $outputtype $systemsize $output $useold > $tempdir/mkimage.log
+
+echo "Remove Temp dir"
+rm -rf "$tempdir"
+
